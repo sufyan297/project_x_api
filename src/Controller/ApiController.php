@@ -82,7 +82,8 @@ class ApiController extends AppController
         if ($this->request->is('post')) {
             $data = $this->request->data;
 
-            
+            // $this->log($data);
+            $this->Query->setAllData('Mosques',$data['mosques_data']);
 
             $res = new ResponseObject();
             // $res -> data = $data ;

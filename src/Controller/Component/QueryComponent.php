@@ -202,6 +202,7 @@ class QueryComponent extends Component
         //Defaults to false
         return false;
     }
+    
     /**
     *   Delete Data
     * @return boolean
