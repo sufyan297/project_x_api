@@ -102,13 +102,52 @@ class ApiController extends AppController
      */
     public function getNearbyMosques()
     {
-        // if ($this->request->is('post')) {
-            // $data = $this->request->data;
+        if ($this->request->is('post')) {
+            $data = $this->request->data;
 
-            $row = $this->Query->rawQuery("SELECT *, ( 6371 * acos( cos( radians(22.317791) ) * cos( radians( `lat` ) ) * cos( radians( `lng` ) - radians(72.615682) ) + sin( radians(22.317791) ) * sin( radians( `lat` ) ) ) ) AS distance FROM `mosques` HAVING distance <= 0.1 ORDER BY distance ASC;");
-            pr($row);
-            die();
-        // }
+            if (!isset($data['lat']) || empty($data['lat']) || !isset($data['lng']) || empty($data['lng'])) {
+                $res = new ResponseObject();
+                $res -> status = 'error' ;
+                $res -> message = 'Invalid parameters.' ;
+                $this -> response -> statusCode(403);
+                $this -> response -> body(json_encode($res));
+                return $this -> response ;    
+            }
+
+            if (!isset($data['radius'])) {
+                $data['radius'] = 1;
+            }
+
+            $lat = $data['lat'];
+            $lng = $data['lng'];
+            $km = $data['radius'];
+
+            $mosques = $this->Query->rawQuery("SELECT *, ( 6371 * acos( cos( radians($lat) ) * cos( radians( `lat` ) ) * cos( radians( `lng` ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( `lat` ) ) ) ) AS distance FROM `mosques` HAVING distance <= $km ORDER BY distance ASC;");
+            
+            if (sizeof($mosques) > 0) {
+                $res = new ResponseObject();
+                $res -> data = $mosques ;
+                $res -> status = 'success' ;
+                $res -> message = 'Near by mosques found.' ;
+                $this -> response -> statusCode(200);                
+                $this -> response -> body(json_encode($res));
+                return $this -> response ;
+            } else {
+                $res = new ResponseObject();
+                $res -> status = 'error' ;
+                $res -> message = 'Oops! No near by mosque found.' ;
+                $this -> response -> statusCode(404);
+                $this -> response -> body(json_encode($res));
+                return $this -> response ;    
+            }
+        }
+        //INVALID_METHOD
+        $res = new ResponseObject();
+        $res -> status = 'error' ;
+        $res -> message = 'INVALID METHOD.' ;
+        $this -> response -> statusCode(400);
+        $this -> response -> body(json_encode($res));
+        return $this -> response ;    
     }
 
 }
