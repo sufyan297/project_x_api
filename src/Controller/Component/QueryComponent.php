@@ -24,6 +24,8 @@ namespace App\Controller\Component;
 use Cake\Controller\Component;
 use Cake\ORM\TableRegistry;
 
+use Cake\Datasource\ConnectionManager;
+
 /**
  * Query Component
  *
@@ -219,6 +221,28 @@ class QueryComponent extends Component
             return true; //It will always return true.
         }
         return false;
+    }
+
+
+    /**
+     * Raw Query
+     * 
+     * @return array
+     */
+    public function rawQuery($query = null, $type = 'all', $db_con = 'default')
+    {
+        if ($query == null) return false;
+        $records = [];
+
+        $conn = ConnectionManager::get($db_con);        
+        $data = $conn->execute($query);
+
+        if ($type == 'one') {
+            $records = $data->fetch('assoc');
+        } else {
+            $records = $data->fetchAll('assoc');            
+        }
+        return $records;
     }
 }
 

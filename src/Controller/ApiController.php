@@ -95,5 +95,20 @@ class ApiController extends AppController
     }
 
 
+    /**
+     * Get Nearby Locations
+     * 
+     * @return json
+     */
+    public function getNearbyMosques()
+    {
+        // if ($this->request->is('post')) {
+            // $data = $this->request->data;
+
+            $row = $this->Query->rawQuery("SELECT *, ( 6371 * acos( cos( radians(22.317791) ) * cos( radians( `lat` ) ) * cos( radians( `lng` ) - radians(72.615682) ) + sin( radians(22.317791) ) * sin( radians( `lat` ) ) ) ) AS distance FROM `mosques` HAVING distance <= 0.1 ORDER BY distance ASC;");
+            pr($row);
+            die();
+        // }
+    }
 
 }
